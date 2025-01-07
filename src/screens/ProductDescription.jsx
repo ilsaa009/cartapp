@@ -12,13 +12,24 @@ export const ProductDescription = () => {
   const { productId } = useParams();
 
   const { STATE, currentProduct, error } = useSelector((state) => state.products);
+  const { ITEMS: cartItems } = useSelector((state) => state.cart);
+
+  useEffect(() => {
+    console.log("Cart items:", cartItems);
+  }, [cartItems]);
 
   const handleAddToCart = () => {
-    if (currentProduct) {
+    if (currentProduct && !isProductInCart(currentProduct.id)) {
       const { id, title, price } = currentProduct;
       dispatch(addtoCart({ id, title, price }));
     }
-  }
+  };
+
+  const isProductInCart = (id) => {
+    return cartItems.some((item) => item.id === id);
+  };
+  
+  
 
   useEffect(() => {
     if (productId) {
@@ -70,11 +81,17 @@ export const ProductDescription = () => {
                 <p>{currentProduct.description}</p>
               </div>
               <button
-            onClick={handleAddToCart}
-            className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-          >
-            Add to Cart
-          </button>
+                onClick={handleAddToCart}
+                disabled={isProductInCart(currentProduct.id)}
+                className={`mt-4 py-2 px-4 rounded-md ${
+                  isProductInCart(currentProduct.id)
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600"
+                } text-white`}
+              >
+                {isProductInCart(currentProduct.id) ? "Added to Cart" : "Add to Cart"}
+              </button>
+
             </div>
           </div>
          

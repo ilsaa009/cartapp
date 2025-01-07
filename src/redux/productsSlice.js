@@ -6,7 +6,7 @@ const initialState = {
     STATE: 'IDLE',
     error: null,
     page: 1,
-    perPage: 3,
+    perPage: 10,
     totalPages: 1,
     currentProduct: null,
 };
