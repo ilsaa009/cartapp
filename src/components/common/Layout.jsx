@@ -7,7 +7,6 @@ export const Layout = ({ children }) => {
     <div>
       <Header />
       <main style={{ minHeight: '80vh' }}>{children}</main>
-      <footer>Footer</footer>
     </div>
   );
 };

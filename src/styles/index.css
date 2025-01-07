@@ -190,6 +190,31 @@ body {
   }
 }
 
+.back-button, .add-to-cart, .add-to-wishlist {
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+.back-button:hover {
+  background-color: #d1d1d1;
+}
+.add-to-cart:hover {
+  background-color: #2563eb; /* Darker blue */
+}
+.add-to-wishlist:hover {
+  background-color: #e5e5e5; /* Darker gray */
+}
+.main-image {
+  width: 100%;
+  border: 1px solid #e5e5e5;
+}
+.thumbnail {
+  cursor: pointer;
+  border: 1px solid #e5e5e5;
+  transition: transform 0.2s;
+}
+.thumbnail:hover {
+  transform: scale(1.1);
+}
 
 .product-btn {
   padding: 5px 11px;
