@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux"; 
-import { fetchProductById } from "../redux/productsSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { useQuery } from "react-query";
+import axios from "axios";
 import Stars from "../components/Stars";
 import Reviews from "../components/Reviews";
 import { addtoCart } from "../redux/cartSlice";
@@ -11,8 +12,25 @@ export const ProductDescription = () => {
   const dispatch = useDispatch();
   const { productId } = useParams();
 
-  const { STATE, currentProduct, error } = useSelector((state) => state.products);
   const { ITEMS: cartItems } = useSelector((state) => state.cart);
+
+  const {
+    data: currentProduct,
+    isLoading,
+    isError,
+    error,
+  } = useQuery(
+    ["product", productId],
+    async () => {
+      const response = await axios.get(
+        `https://dummyjson.com/products/${productId}`
+      );
+      return response.data;
+    },
+    {
+      enabled: !!productId, 
+    }
+  );
 
   useEffect(() => {
     console.log("Cart items:", cartItems);
@@ -28,14 +46,6 @@ export const ProductDescription = () => {
   const isProductInCart = (id) => {
     return cartItems.some((item) => item.id === id);
   };
-  
-  
-
-  useEffect(() => {
-    if (productId) {
-      dispatch(fetchProductById(productId));
-    }
-  }, [dispatch, productId]);
 
   const calculateAverageRating = (reviews) => {
     if (!reviews || !Array.isArray(reviews) || reviews.length === 0) return 0;
@@ -64,21 +74,33 @@ export const ProductDescription = () => {
         Back
       </button>
 
-      {STATE === 'PENDING' && <p>Loading...</p>}
-      {STATE === 'FAILIURE' && <p className="text-red-500">Error: {error}</p>}
+      {isLoading && <p>Loading...</p>}
+      {isError && <p className="text-red-500">Error: {error.message}</p>}
 
-      {STATE === 'SUCCESS' && currentProduct && (
+      {currentProduct && (
         <>
           <div className="flex gap-6">
-            <div className="product-images w-1/3">
-              <div
-                className="main-image bg-gray-100 h-60 mb-4"
-                style={{ backgroundImage: `url(${currentProduct.thumbnail})` }}
-              ></div>
+          <div className="product-images w-1/3">
+            <div
+              className="main-image bg-gray-100 h-80 mb-4"
+              style={{ backgroundImage: `url(${currentProduct.thumbnail})` }}
+            >
             </div>
+          </div>
+
             <div className="product-details w-2/3">
               <div className="product-description bg-gray-100 p-4 mb-4">
                 <p>{currentProduct.description}</p>
+              </div>
+              <div className="product-description bg-gray-100 p-4 mb-4">
+                <p>Brand: {currentProduct.brand}</p>
+                <p>Stock: {currentProduct.stock}</p>
+                <p>Warranty: {currentProduct.warrantyInformation}</p>
+                <p>Shipping: {currentProduct.shippingInformation}</p>
+                <p>Category: {currentProduct.category}</p>
+                <p>Availability: {currentProduct.availabilityStatus}</p>
+                <p>Return Policy: {currentProduct.returnPolicy}</p>
+                <p>Minimum Orders: {currentProduct.minimumOrderQuantity}</p>
               </div>
               <button
                 onClick={handleAddToCart}
@@ -91,10 +113,10 @@ export const ProductDescription = () => {
               >
                 {isProductInCart(currentProduct.id) ? "Added to Cart" : "Add to Cart"}
               </button>
-
             </div>
           </div>
-         
+          <br></br>
+          <br></br>
           <div className="ratings-overview bg-gray-100 p-6 rounded-lg">
             <div className="flex items-center gap-6">
               <div className="average-rating text-center">
@@ -105,7 +127,7 @@ export const ProductDescription = () => {
                   rating={Math.round(calculateAverageRating(currentProduct.reviews))}
                 />
                 <p className="text-gray-600">
-                  {currentProduct.reviews?.length || 0} Ratings
+                  {currentProduct.reviews?.length || 0} ⭐ Ratings
                 </p>
               </div>
 
@@ -113,7 +135,7 @@ export const ProductDescription = () => {
                 {getRatingDistribution(currentProduct.reviews).map((count, index) => (
                   <div key={5 - index} className="flex items-center mb-2">
                     <span className="text-sm font-medium w-10 text-right">
-                      {5 - index} star
+                      {5 - index} ⭐
                     </span>
                     <div className="w-full bg-gray-300 h-2 mx-2 rounded">
                       <div
